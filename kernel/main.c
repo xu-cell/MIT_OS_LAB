@@ -16,18 +16,18 @@ main()
     printf("\n");
     printf("xv6 kernel is booting\n");
     printf("\n");
-    kinit();         // physical page allocator
-    kvminit();       // create kernel page table
-    kvminithart();   // turn on paging
-    procinit();      // process table
-    trapinit();      // trap vectors
-    trapinithart();  // install kernel trap vector
+    kinit();         // physical page allocator 设置好页表分配器（page allocator）
+    kvminit();       // create kernel page table 设置好虚拟内存
+    kvminithart();   // turn on paging 打开页表
+    procinit();      // process table 设置好初始进程或者说设置好进程表单
+    trapinit();      // trap vectors 设置好user/kernel mode转换代码
+    trapinithart();  // install kernel trap vector 
     plicinit();      // set up interrupt controller
-    plicinithart();  // ask PLIC for device interrupts
-    binit();         // buffer cache
-    iinit();         // inode table
-    fileinit();      // file table
-    virtio_disk_init(); // emulated hard disk
+    plicinithart();  // ask PLIC for device interrupts 设置好中断控制器PLIC
+    binit();         // buffer cache 分配buffer cache
+    iinit();         // inode table 初始化inode缓存
+    fileinit();      // file table 初始化文件系统
+    virtio_disk_init(); // emulated hard disk 初始化磁盘
     userinit();      // first user process
     __sync_synchronize();
     started = 1;
