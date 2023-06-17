@@ -6,7 +6,6 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
-
 uint64
 sys_exit(void)
 {
@@ -94,4 +93,35 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+
+// 通过传入mask的1的位置确定监控哪个syscall
+int 
+sys_trace(void) {
+  int mask;
+  if(argint(0,&mask) < 0) {
+    return -1;
+  }
+   acquire(&tickslock);
+  myproc()->mask = mask;
+   release(&tickslock);
+  return 0;
+}
+
+int
+sys_info(void) {
+   uint64 address;
+   if(argaddr(0,&address) < 0) {
+    return -1;
+   }
+   acquire(&tickslock);
+   myproc()->info.freemem = count_free_mem();
+   myproc()->info.nproc = count_free_proc();
+   if(copyout(myproc()->pagetable,address,(char*)&myproc()->info,sizeof(myproc()->info)) < 0) {
+      release(&tickslock);
+    return -1;
+   }
+    release(&tickslock);
+   return 0;
 }

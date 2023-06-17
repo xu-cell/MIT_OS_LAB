@@ -139,6 +139,7 @@ found:
   // which returns to user space.
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
+  p->mask = 0;
   p->context.sp = p->kstack + PGSIZE;
 
   return p;
@@ -272,7 +273,7 @@ growproc(int n)
 int
 fork(void)
 {
-  int i, pid;
+  int i,pid;
   struct proc *np;
   struct proc *p = myproc();
 
@@ -291,7 +292,7 @@ fork(void)
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
-
+  np->mask = p->mask;
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
 
@@ -653,4 +654,17 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+uint64 count_free_proc(void) {
+
+  struct proc *p;
+  uint64 number = 0;
+ 
+  for(p = proc; p < &proc[NPROC]; p++){
+    if(p->state != UNUSED) {
+        number++;
+        continue;
+    }
+  }
+  return number;
 }

@@ -17,6 +17,10 @@ struct context {
   uint64 s10;
   uint64 s11;
 };
+struct sysinfo {
+  uint64 freemem;   // amount of free memory (bytes)
+  uint64 nproc;     // number of process
+};
 
 // Per-CPU state.
 struct cpu {
@@ -85,14 +89,14 @@ enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 // Per-process state
 struct proc {
   struct spinlock lock;
-
+  struct sysinfo info;
   // p->lock must be held when using these:
   enum procstate state;        // Process state
   void *chan;                  // If non-zero, sleeping on chan
   int killed;                  // If non-zero, have been killed
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
-
+  uint64 mask;
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
 
